@@ -13,12 +13,10 @@ on:
       - terraform/**
 
 env:
-  # verbosity setting for Terraform logs
   TF_LOG: INFO
-  # Credentials for deployment to AWS
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  # S3 bucket for the Terraform state
+
   BUCKET_TF_STATE: ${{ secrets.BUCKET_TF_STATE}}
 
 jobs:
@@ -28,7 +26,6 @@ jobs:
     defaults:
       run:
         shell: bash
-        # We keep Terraform files in the terraform directory.
         working-directory: ./terraform
 
     steps:
@@ -94,13 +91,12 @@ jobs:
         run: terraform apply -auto-approve -input=false
 
         # ---------- Security Scans (IaC) ----------
-      # Trivy config scan against Terraform (outputs SARIF)
-      - name: Trivy IaC (Terraform) - config scan
+      - name: Trivy config scan
         uses: aquasecurity/trivy-action@0.24.0
         with:
           scan-type: "config"
           scan-ref: "./terraform"
-          exit-code: "1" # fail on findings (tune as needed)
+          exit-code: "1"
           ignore-unfixed: true
           format: "sarif"
           output: "trivy-results.sarif"
@@ -110,13 +106,13 @@ jobs:
         with:
           sarif_file: trivy-results.sarif
 
-      # Checkov scan against Terraform (also outputs SARIF)
+      # Checkov scan against Terraform
       - name: Checkov IaC scan
         uses: bridgecrewio/checkov-action@v12
         with:
           directory: ./terraform
           framework: terraform
-          soft_fail: false # set true if you want non-blocking in PRs
+          soft_fail: false
           output_format: sarif
           output_file_path: ./checkov.sarif
           download_external_modules: true
