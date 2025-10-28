@@ -1,12 +1,14 @@
 resource "aws_lb_target_group" "TG" {
   name        = "TG"
-  target_type = "ip"
-  port        = 80
-  protocol    = "HTTP"
-  vpc_id      = aws_vpc.vpc.id
+  target_type = var.target_type
+  port        = var.port
+  protocol    = var.protocol
+  vpc_id      = var.vpc_id
 
-  tags = {
-    "Name" = "prod-target-group"
-  }
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.name_prefix}-target-group"
+    }
+  )
 }
-

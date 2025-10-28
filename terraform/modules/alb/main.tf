@@ -1,41 +1,54 @@
 resource "aws_lb" "load_balancer" {
-  name               = "alb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.SG.id]
-  subnets            = [aws_subnet.public_subnet1.id, aws_subnet.public_subnet2.id]
+  name               = "${var.name_prefix}-alb"
+  internal           = var.internal
+  load_balancer_type = var.load_balancer_type
+  security_groups    = var.security_group_ids
+  subnets            = var.subnet_ids
 
-  tags = {
-    name = "prod-alb"
-  }
+  tags = merge(
+    var.tags,
+    { Name = "${var.name_prefix}-alb" }
+  )
 }
 
-resource "aws_lb_listener" "listener" {
+resource "aws_lb_listener" "http_redirect" {
+  count             = var.http_enabled && var.redirect_http_to_https ? 1 : 0
   load_balancer_arn = aws_lb.load_balancer.arn
-  port              = 80
+  port              = var.http_port
   protocol          = "HTTP"
 
   default_action {
     type = "redirect"
     redirect {
-      port        = "443"
+      port        = tostring(var.https_port)
       protocol    = "HTTPS"
       status_code = "HTTP_301"
     }
   }
 }
 
-
-resource "aws_lb_listener" "https" {
+resource "aws_lb_listener" "http_forward" {
+  count             = var.http_enabled && !var.redirect_http_to_https ? 1 : 0
   load_balancer_arn = aws_lb.load_balancer.arn
-  port              = 443
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-
-  certificate_arn = aws_acm_certificate_validation.cert_validation.certificate_arn
+  port              = var.http_port
+  protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.TG.arn
+    target_group_arn = var.http_forward_target_group_arn
+  }
+}
+
+resource "aws_lb_listener" "https" {
+  count             = var.https_enabled ? 1 : 0
+  load_balancer_arn = aws_lb.load_balancer.arn
+  port              = var.https_port
+  protocol          = "HTTPS"
+  ssl_policy        = var.ssl_policy
+  certificate_arn   = var.certificate_arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = var.https_forward_target_group_arn
   }
 }

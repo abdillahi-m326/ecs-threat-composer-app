@@ -1,45 +1,64 @@
+locals {
+  task_role_name      = coalesce(var.task_role_name, "${var.name_prefix}-ecs-task-role")
+  execution_role_name = coalesce(var.execution_role_name, "${var.name_prefix}-ecs-task-execution-role")
+}
+
 resource "aws_iam_role" "ecs_task_role" {
-  name = "ecs_role"
+  name = local.task_role_name
 
   assume_role_policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
+    Version = "2012-10-17"
+    Statement = [
       {
-        "Effect" : "Allow",
-        "Principal" : {
-          "Service" : [
-            "ecs-tasks.amazonaws.com"
-          ]
-        },
-        "Action" : "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = var.task_assume_role_services
+        }
+        Action = "sts:AssumeRole"
       }
     ]
   })
 
-  tags = {
-    tag-key = "prod-ecs_task_role"
-  }
+  tags = merge(
+    var.tags,
+    {
+      Name = local.task_role_name
+    }
+  )
 }
 
-# ECS task execution role: lets Fargate pull images & write logs
+resource "aws_iam_role_policy_attachment" "task_policy_attachments" {
+  for_each   = toset(var.task_managed_policy_arns)
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = each.value
+}
+
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "ecs_task_execution_role"
+  name = local.execution_role_name
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Effect    = "Allow"
-      Principal = { Service = "ecs-tasks.amazonaws.com" }
-      Action    = "sts:AssumeRole"
-    }]
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = var.execution_assume_role_services
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
   })
 
-  tags = {
-    role = "prod-ecs_task_execution_role"
-  }
+  tags = merge(
+    var.tags,
+    {
+      Name = local.execution_role_name
+    }
+  )
 }
 
-resource "aws_iam_role_policy_attachment" "test-attach" {
+resource "aws_iam_role_policy_attachment" "execution_policy_attachments" {
+  for_each   = toset(var.execution_managed_policy_arns)
   role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+  policy_arn = each.value
 }

@@ -1,29 +1,35 @@
 data "aws_route53_zone" "primary" {
-  name         = "abdillahimirie.click"
-  private_zone = false
+  count        = var.zone_id == null ? 1 : 0
+  name         = var.zone_name
+  private_zone = var.private_zone
+}
+
+locals {
+  hosted_zone_id = var.zone_id != null ? var.zone_id : data.aws_route53_zone.primary[0].zone_id
 }
 
 resource "aws_route53_record" "root" {
-  zone_id = data.aws_route53_zone.primary.zone_id
-  name    = "abdillahimirie.click"
+  count   = var.enable_root_record ? 1 : 0
+  zone_id = local.hosted_zone_id
+  name    = var.root_record_name != "" ? var.root_record_name : var.zone_name
   type    = "A"
 
   alias {
-    name                   = aws_lb.load_balancer.dns_name
-    zone_id                = aws_lb.load_balancer.zone_id
-    evaluate_target_health = true
+    name                   = var.alias_name
+    zone_id                = var.alias_zone_id
+    evaluate_target_health = var.evaluate_target_health
   }
 }
 
 resource "aws_route53_record" "www" {
-  zone_id = data.aws_route53_zone.primary.zone_id
-  name    = "www"
+  count   = var.enable_www_record ? 1 : 0
+  zone_id = local.hosted_zone_id
+  name    = var.www_record_name
   type    = "A"
 
   alias {
-    name                   = aws_lb.load_balancer.dns_name
-    zone_id                = aws_lb.load_balancer.zone_id
-    evaluate_target_health = true
+    name                   = var.alias_name
+    zone_id                = var.alias_zone_id
+    evaluate_target_health = var.evaluate_target_health
   }
 }
-
