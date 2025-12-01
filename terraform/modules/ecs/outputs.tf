@@ -1,9 +1,11 @@
-output "ecs_service_arn" {
-  description = "ARN of the ECS service"
-  value       = aws_ecs_service.ecs_react_app_service.arn
+output "cluster_id" {
+  value = aws_ecs_cluster.ecs_cluster.id
 }
 
-output "ecs_cluster_arn" {
-  description = "ARN of the ECS cluster"
-  value       = aws_ecs_cluster.ecs_cluster_react_app.arn
+output "service_name" {
+  value = aws_ecs_service.service.name
+}
+
+output "task_definition_arn" {
+  value = aws_ecs_task_definition.task.arn
 }

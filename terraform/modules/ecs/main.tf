@@ -1,63 +1,65 @@
-resource "aws_ecs_cluster" "ecs_cluster_react_app" {
+resource "aws_ecs_cluster" "ecs_cluster" {
   name = var.cluster_name
 
-
   tags = {
-    name = "${var.name_prefix}-react_app_cluster"
+    Name = "${var.name_prefix}-ecs-cluster"
   }
 }
 
-resource "aws_ecs_service" "ecs_react_app_service" {
+resource "aws_ecs_task_definition" "task" {
+  family                   = var.task_family
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = var.task_cpu
+  memory                   = var.task_memory
+  execution_role_arn       = var.ecs_task_execution_role_arn
+
+  container_definitions = jsonencode([
+    {
+      name      = var.container_name
+      image     = var.container_image
+      essential = true
+
+      portMappings = [
+        {
+          containerPort = var.container_port
+          hostPort      = var.container_port
+          protocol      = "tcp"
+        }
+      ]
+
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = var.log_group_name
+          awslogs-region        = var.aws_region
+          awslogs-stream-prefix = "ecs"
+        }
+      }
+    }
+  ])
+}
+
+resource "aws_ecs_service" "service" {
   name                               = var.ecs_service_name
-  cluster                            = aws_ecs_cluster.ecs_cluster_react_app.id
-  launch_type                        = var.ecs_launch_type_fargate
-  platform_version                   = var.latest_platform_version
-  scheduling_strategy                = var.scheduling_strategy_replica
-  deployment_maximum_percent         = var.deployment_maximum_percent
-  deployment_minimum_healthy_percent = var.deployment_minimum_percent
-  task_definition                    = aws_ecs_task_definition.TD.arn
-  desired_count                      = 2
-  depends_on                         = [aws_lb_listener.listener, aws_iam_role.ecs_task_execution_role]
-
-
+  cluster                            = aws_ecs_cluster.ecs_cluster.id
+  task_definition                    = aws_ecs_task_definition.task.arn
+  launch_type                        = "FARGATE"
+  platform_version                   = "LATEST"
+  desired_count                      = var.desired_count
+  scheduling_strategy                = "REPLICA"
+  deployment_maximum_percent         = 200
+  deployment_minimum_healthy_percent = 100
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.TG.arn
+    target_group_arn = var.target_group_arn
     container_name   = var.container_name
     container_port   = var.container_port
   }
 
   network_configuration {
     assign_public_ip = false
-    security_groups  = [aws_security_group.SG.id]
-    subnets          = [aws_subnet.private_subnet1.id, aws_subnet.private_subnet2.id]
+    subnets          = var.subnet_ids
+    security_groups  = [var.tasks_security_group_id]
   }
 }
-
-resource "aws_ecs_task_definition" "TD" {
-  family                   = var.aws_ecs_task_definition_family
-  requires_compatibilities = ["FARGATE"]
-  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
-  network_mode             = "awsvpc"
-  cpu                      = var.task_cpu
-  memory                   = var.task_memory
-  container_definitions = jsonencode([
-    {
-      name  = var.container_definition_name
-      image = "${var.docker_user}/${var.docker_repo}:${var.imagetag}"
-
-      essential = true
-      portMappings = [
-        {
-          containerPort = var.container_port
-          hostPort      = var.container_port
-        }
-      ]
-  }])
-
-}
-
-data "aws_ecs_task_definition" "TD" {
-  task_definition = aws_ecs_task_definition.TD.family
-}
-

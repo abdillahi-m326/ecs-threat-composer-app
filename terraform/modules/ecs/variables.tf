@@ -1,104 +1,85 @@
+variable "name_prefix" {
+  description = "Name prefix for tagging resources"
+  type        = string
+}
+
+variable "aws_region" {
+  description = "AWS region for logs"
+  type        = string
+}
+
 variable "cluster_name" {
-  description = "Name for cluster"
+  description = "Name of ECS cluster"
   type        = string
   default     = "react_app_cluster"
 }
 
-variable "name_prefix" {
-  description = "Prefix for naming IAM roles"
-  type        = string
-}
-
 variable "ecs_service_name" {
-  description = "Name of ecs service"
+  description = "Name of the ECS service"
   type        = string
   default     = "ecs_react_service"
 }
 
-variable "ecs_launch_type_fargate" {
-  description = "Fargate as the launch type for ecs"
-  type        = string
-  default     = "FARGATE"
-}
-
-variable "latest_platform_version" {
-  description = "Latest platform version"
-  type        = string
-  default     = "LATEST"
-}
-
-variable "scheduling_strategy_replica" {
-  description = "Replica"
-  type        = string
-  default     = "REPLICA"
-}
-
-variable "deployment_maximum_percent" {
-  description = "Maximum deployment percentage"
+variable "desired_count" {
+  description = "Number of running tasks"
   type        = number
-  default     = 200
+  default     = 2
 }
 
-variable "deployment_minimum_percent" {
-  description = "Minimum deployment percentage"
-  type        = number
-  default     = 100
+variable "subnet_ids" {
+  description = "List of PRIVATE subnet IDs for ECS tasks"
+  type        = list(string)
 }
-variable "container_name" {
-  description = "Name of container"
+
+variable "tasks_security_group_id" {
+  description = "Security group ID for ECS tasks"
   type        = string
-  default     = "react_app_container"
 }
 
-variable "container_port" {
-  description = "Port number for container"
-  type        = number
-  default     = 80
-}
-
-variable "container_image" {
-  description = "Image from docker/ECR used for container"
+variable "target_group_arn" {
+  description = "ARN of the ALB Target Group"
   type        = string
-  default     = "amdocker32695/ecs_proj_reacr_app:latest"
 }
 
-variable "container_definition_name" {
-  description = "Name of container definition"
+variable "task_family" {
+  description = "ECS task definition family name"
   type        = string
-  default     = "react_app_container"
+  default     = "ecs_task_family"
 }
 
 variable "task_cpu" {
-  description = "cpu capacity for task"
+  description = "CPU units for the task"
   type        = number
   default     = 1024
 }
 
 variable "task_memory" {
-  description = "memory capacity for task"
+  description = "Memory for the task (in MiB)"
   type        = number
   default     = 2048
 }
 
-variable "docker_user" {
-  description = "Docker user name"
+variable "container_name" {
+  description = "Name of the application container"
   type        = string
-  default     = "amdocker32695"
 }
 
-variable "docker_repo" {
-  description = "Docker repository name"
-  type        = string
-  default     = "ecs_proj_reacr_app"
+variable "container_port" {
+  description = "Container port exposed"
+  type        = number
 }
 
-variable "imagetag" {
-  description = "Docker image tag to deploy"
+variable "container_image" {
+  description = "Full container image URI (Docker Hub or ECR)"
   type        = string
-  default     = "latest"
 }
 
-variable "aws_ecs_task_definition_family" {
-  type    = string
-  default = "threat_composer_service_task"
+variable "ecs_task_execution_role_arn" {
+  description = "Execution role ARN for ECS tasks to pull images/logs"
+  type        = string
+}
+
+variable "log_group_name" {
+  description = "CloudWatch log group name"
+  type        = string
 }
