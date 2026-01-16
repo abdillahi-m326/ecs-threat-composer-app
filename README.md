@@ -1,4 +1,4 @@
-# Production-Grade Deployment of AWS Threat Composer on AWS ECS Fargate
+# AWS Threat Composer on AWS ECS Fargate
 
 Production-ready deployment of the **AWS Threat Composer web application** on **AWS ECS Fargate** using **Terraform** for Infrastructure as Code. This project demonstrates real-world **DevOps, Cloud, and Platform Engineering** practices including modular Terraform, container orchestration, secure networking, and CI/CD-ready workflows.
 
@@ -175,15 +175,6 @@ After deployment, verify:
 
 ---
 
-## 🎯 Learning Outcomes
-
-- Hands-on experience with ECS Fargate deployments
-- Practical Terraform usage for AWS infrastructure
-- Docker and Nginx integration
-- Production-style project structuring for DevOps roles
-
----
-
 ## 🚀 Future Improvements
 
 1. **CI/CD Enhancements**
@@ -201,17 +192,4 @@ After deployment, verify:
 4. **Observability**
    - CloudWatch dashboards and alarms
    - Centralized logging and metrics
-
----
-
-## 👤 Author
-
-**Your Name**  
-DevOps / Cloud Engineer
-
----
-
-## 📄 License
-
-This project is intended for educational and portfolio purposes.
 
