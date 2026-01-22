@@ -78,7 +78,7 @@ module "targetgroup" {
 
 resource "aws_cloudwatch_log_group" "ecs_app" {
   name              = "/ecs/react_app"
-  retention_in_days = 7
+  retention_in_days = 6
 
   tags = {
     Name        = "${var.name_prefix}-ecs-react-app-logs"

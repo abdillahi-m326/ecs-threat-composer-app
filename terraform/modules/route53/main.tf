@@ -1,13 +1,22 @@
+############################################
+# ROUTE 53 HOSTED ZONE LOOKUP
+############################################
 data "aws_route53_zone" "primary" {
   count        = var.zone_id == null ? 1 : 0
   name         = var.zone_name
   private_zone = var.private_zone
 }
 
+############################################
+# LOCALS
+############################################
 locals {
   hosted_zone_id = var.zone_id != null ? var.zone_id : data.aws_route53_zone.primary[0].zone_id
 }
 
+############################################
+# ROOT A RECORD (ALIAS)
+############################################
 resource "aws_route53_record" "root" {
   count   = var.enable_root_record ? 1 : 0
   zone_id = local.hosted_zone_id
@@ -21,6 +30,9 @@ resource "aws_route53_record" "root" {
   }
 }
 
+############################################
+# WWW A RECORD (ALIAS)
+############################################
 resource "aws_route53_record" "www" {
   count   = var.enable_www_record ? 1 : 0
   zone_id = local.hosted_zone_id

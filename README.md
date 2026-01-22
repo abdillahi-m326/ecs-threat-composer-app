@@ -2,6 +2,7 @@
 
 Production-ready deployment of the **AWS Threat Composer web application** on **AWS ECS Fargate** using **Terraform** for Infrastructure as Code. This project demonstrates real-world **DevOps, Cloud, and Platform Engineering** practices including modular Terraform, container orchestration, secure networking, and CI/CD-ready workflows.
 
+> **Note:** This repository serves as a **portfolio and learning project**. Infrastructure may be created and destroyed as part of experimentation.
 
 ---
 
@@ -174,6 +175,7 @@ After deployment, verify:
 
 ---
 
+
 ## 🚀 Future Improvements
 
 1. **CI/CD Enhancements**
@@ -191,4 +193,8 @@ After deployment, verify:
 4. **Observability**
    - CloudWatch dashboards and alarms
    - Centralized logging and metrics
+
+---
+
+
 
