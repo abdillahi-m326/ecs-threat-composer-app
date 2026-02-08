@@ -20,7 +20,7 @@ output "alb_dns_name" {
 
 output "domain_name" {
   description = "Public domain name associated with the ECS application"
-  value       = "ecsprojectv1am.click"
+  value       = "threatcomposerecsabdillahi.click"
 }
 
 output "ecs_cluster_id" {

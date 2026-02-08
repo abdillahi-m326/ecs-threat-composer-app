@@ -26,10 +26,10 @@ module "alb" {
 
 module "acm" {
   source                    = "./modules/acm"
-  domain_name               = "ecsprojectv1am.click"
-  subject_alternative_names = ["www.ecsprojectv1am.click"]
+  domain_name               = "threatcomposerecsabdillahi.click"
+  subject_alternative_names = ["www.threatcomposerecsabdillahi.click"]
 
-  zone_name = "ecsprojectv1am.click"
+  zone_name = "threatcomposerecsabdillahi.click"
 
   tags = {
     Environment = "production"
@@ -51,7 +51,7 @@ module "iam" {
 module "route53" {
   source = "./modules/route53"
 
-  zone_name     = "ecsprojectv1am.click"
+  zone_name     = "threatcomposerecsabdillahi.click"
   alias_name    = module.alb.alb_dns_name
   alias_zone_id = module.alb.alb_zone_id
 
