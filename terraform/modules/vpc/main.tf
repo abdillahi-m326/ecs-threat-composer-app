@@ -1,6 +1,3 @@
-###########################################
-# VPC
-###########################################
 resource "aws_vpc" "vpc" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = var.enable_dns_hostnames
@@ -14,9 +11,6 @@ resource "aws_vpc" "vpc" {
   )
 }
 
-############################################
-# PUBLIC SUBNETS + IGW + PUBLIC ROUTING
-############################################
 resource "aws_subnet" "public_subnet1" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = var.public_subnet_cidrs[0]
@@ -83,9 +77,6 @@ resource "aws_route_table_association" "public_association2" {
   route_table_id = aws_route_table.public_route_table.id
 }
 
-############################################
-# PRIVATE SUBNETS + NAT + PRIVATE ROUTING
-############################################
 resource "aws_subnet" "private_subnet1" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = var.private_subnet_cidrs[0]

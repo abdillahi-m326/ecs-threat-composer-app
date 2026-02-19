@@ -1,6 +1,3 @@
-############################################
-# Target group
-############################################
 resource "aws_lb_target_group" "TG" {
   name        = "TG"
   target_type = var.target_type

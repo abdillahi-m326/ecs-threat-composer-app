@@ -1,6 +1,3 @@
-############################################
-# ECS CLUSTER
-############################################
 resource "aws_ecs_cluster" "ecs_cluster" {
   name = var.cluster_name
 
@@ -9,9 +6,6 @@ resource "aws_ecs_cluster" "ecs_cluster" {
   }
 }
 
-############################################
-# ECS TASK DEFINITION (FARGATE)
-############################################
 resource "aws_ecs_task_definition" "task" {
   family                   = var.task_family
   requires_compatibilities = ["FARGATE"]
@@ -46,9 +40,6 @@ resource "aws_ecs_task_definition" "task" {
   ])
 }
 
-############################################
-# ECS SERVICE (FARGATE)
-############################################
 resource "aws_ecs_service" "service" {
   name                               = var.ecs_service_name
   cluster                            = aws_ecs_cluster.ecs_cluster.id

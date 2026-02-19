@@ -1,22 +1,13 @@
-############################################
-# ROUTE 53 HOSTED ZONE LOOKUP 
-############################################
 data "aws_route53_zone" "selected" {
   count        = var.zone_id == null ? 1 : 0
   name         = var.zone_name
   private_zone = var.private_zone
 }
 
-############################################
-# LOCALS
-############################################
 locals {
   hosted_zone_id = var.zone_id != null ? var.zone_id : data.aws_route53_zone.selected[0].zone_id
 }
 
-############################################
-# ACM CERTIFICATE
-############################################
 resource "aws_acm_certificate" "acm_cert" {
   domain_name               = var.domain_name
   subject_alternative_names = var.subject_alternative_names
@@ -29,9 +20,6 @@ resource "aws_acm_certificate" "acm_cert" {
   }
 }
 
-############################################
-# ROUTE 53 DNS VALIDATION RECORDS
-############################################
 resource "aws_route53_record" "acm_certificate_validation" {
   for_each = {
     for dvo in aws_acm_certificate.acm_cert.domain_validation_options :
@@ -50,9 +38,6 @@ resource "aws_route53_record" "acm_certificate_validation" {
   allow_overwrite = var.allow_overwrite
 }
 
-############################################
-# ACM CERTIFICATE VALIDATION
-############################################
 resource "aws_acm_certificate_validation" "cert_validation" {
   certificate_arn         = aws_acm_certificate.acm_cert.arn
   validation_record_fqdns = [for r in aws_route53_record.acm_certificate_validation : r.fqdn]

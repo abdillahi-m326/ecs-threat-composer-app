@@ -1,6 +1,3 @@
-############################################
-# Security group
-############################################
 resource "aws_security_group" "SG" {
   name        = "SG"
   description = var.description

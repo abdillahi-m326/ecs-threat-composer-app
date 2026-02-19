@@ -1,6 +1,3 @@
-############################################
-# APPLICATION LOAD BALANCER (ALB)
-############################################
 resource "aws_lb" "load_balancer" {
   name               = "${var.name_prefix}-alb"
   internal           = var.internal
@@ -14,9 +11,6 @@ resource "aws_lb" "load_balancer" {
   )
 }
 
-############################################
-# LISTENER: HTTP -> HTTPS REDIRECT
-############################################
 resource "aws_lb_listener" "http_redirect" {
   count             = var.http_enabled && var.redirect_http_to_https ? 1 : 0
   load_balancer_arn = aws_lb.load_balancer.arn
@@ -33,9 +27,6 @@ resource "aws_lb_listener" "http_redirect" {
   }
 }
 
-############################################
-# LISTENER: HTTP FORWARD
-############################################
 resource "aws_lb_listener" "http_forward" {
   count             = var.http_enabled && !var.redirect_http_to_https ? 1 : 0
   load_balancer_arn = aws_lb.load_balancer.arn
@@ -48,9 +39,6 @@ resource "aws_lb_listener" "http_forward" {
   }
 }
 
-############################################
-# LISTENER: HTTPS FORWARD
-############################################
 resource "aws_lb_listener" "https" {
   count             = var.https_enabled ? 1 : 0
   load_balancer_arn = aws_lb.load_balancer.arn
